@@ -79,7 +79,7 @@ public class FongoDBCollection extends DBCollection {
   }
 
   public Object putIdIfNotPresent(DBObject obj) {
-    if (!obj.containsField(ID_KEY)) {
+    if (obj.get(ID_KEY) == null) {
       ObjectId id = new ObjectId();
       if (!nonIdCollection){
         obj.put(ID_KEY, id);
@@ -276,7 +276,7 @@ public class FongoDBCollection extends DBCollection {
 
 
 
-  @Override
+    @Override
   public void createIndex(DBObject keys, DBObject options, DBEncoder encoder) throws MongoException {
     DBCollection indexColl = fongoDb.getCollection("system.indexes");
     BasicDBObject rec = new BasicDBObject();
@@ -297,10 +297,15 @@ public class FongoDBCollection extends DBCollection {
     indexColl.insert(rec);
   }
 
-  
+
+  @Override
+  Iterator<DBObject> __find(DBObject ref, DBObject fields, int numToSkip, int batchSize, int limit, int options, ReadPreference readPref, DBDecoder decoder) throws MongoException {
+    return __find( ref,  fields,  numToSkip,  batchSize,  limit,  options,  readPref,  decoder, null);
+  }
+
   @Override
   synchronized Iterator<DBObject> __find(DBObject ref, DBObject fields, int numToSkip, int batchSize, int limit, int options,
-      ReadPreference readPref, DBDecoder decoder) throws MongoException {
+      ReadPreference readPref, DBDecoder decoder, DBEncoder encoder) throws MongoException {
     if (LOG.isDebugEnabled()){
       LOG.debug("find(" + ref + ").limit("+limit+").skip("+numToSkip+")");
       LOG.debug("the db looks like " + objects);
@@ -348,7 +353,7 @@ public class FongoDBCollection extends DBCollection {
     return results.iterator();
   }
 
-  public Collection<DBObject> sortObjects(final DBObject orderby) {
+    public Collection<DBObject> sortObjects(final DBObject orderby) {
     Collection<DBObject> objectsToSearch = objects.values();
     if (orderby != null) {
       final Set<String> orderbyKeySet = orderby.keySet();
