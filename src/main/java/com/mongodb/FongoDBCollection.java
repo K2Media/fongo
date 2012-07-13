@@ -345,11 +345,7 @@ public class FongoDBCollection extends DBCollection {
     if (LOG.isDebugEnabled()){
       LOG.debug("found results " + results);
     }
-    if (results.size() == 0){
-      return null;
-    } else {
-      return results.iterator();      
-    }
+    return results.iterator();
   }
 
   public Collection<DBObject> sortObjects(final DBObject orderby) {
